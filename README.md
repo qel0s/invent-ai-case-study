@@ -12,10 +12,10 @@ Bu proje, kullanıcıların kitapları ödünç almasına, iade etmesine ve kita
 ## Kurulum
 1. **Proje Kopyalama:**
    ```bash
-    git clone [https://github.com/qel0s/invent-ai-case-study.git](https://github.com/qel0s/invent-ai-case-study.git)
+    git clone https://github.com/qel0s/invent-ai-case-study.git
 
 2. **Bağımlılıkları Yükleme:**
-
+```bash
     -cd web
     -npm install
     -cd ..
