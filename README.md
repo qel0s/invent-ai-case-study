@@ -15,7 +15,7 @@ Bu proje, kullanıcıların kitapları ödünç almasına, iade etmesine ve kita
     git clone https://github.com/qel0s/invent-ai-case-study.git
 
 2. **Bağımlılıkları Yükleme:**
-```bash
+
     -cd web
     -npm install
     -cd ..
