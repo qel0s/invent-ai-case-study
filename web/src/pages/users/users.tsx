@@ -3,6 +3,7 @@ import { Button, Card, Table, TableColumnsType } from "antd"
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
 import { axiosInstance } from "../../plugins/axios";
+import { toast } from 'react-toastify';
 
 const UsersPage = () => {
 
@@ -15,6 +16,7 @@ const UsersPage = () => {
             .then((response) => { setUsers(response?.data || []); })
             .catch((error) => {
                 console.log(error)
+                toast.error(error?.response?.data?.message || 'Error returning book');
             })
             .finally(() => { setLoading(false); });
 

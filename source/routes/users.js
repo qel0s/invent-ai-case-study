@@ -53,4 +53,33 @@ router.get('/:id', async (req, res) => {
   }
 });
 
+router.post('/:user_id/return/:book_id', async (req, res) => {
+
+  const user_id = req.params.user_id;
+  const book_id = req.params.book_id;
+  const rating = req.body.rating;
+
+  if (!rating) {
+    return res.status(400).json({ message: 'Score is required' });
+  }
+
+  try {
+    await knex('borrowed_books')
+      .where({ user_id, book_id })
+      .update({ return_date: knex.fn.now() });
+
+    await knex('book_ratings').insert({
+      user_id,
+      book_id,
+      rating,
+    });
+
+    res.json({ message: 'Book returned successfully!' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Error returning book' });
+  }
+
+});
+
 module.exports = router;

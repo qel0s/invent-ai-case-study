@@ -1,9 +1,9 @@
 
-import { Card, Table, TableColumnsType, Tooltip } from "antd"
+import { Button, Card, Input, Modal, Table, TableColumnsType } from "antd"
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import { axiosInstance } from "../../plugins/axios";
-import dayjs from "dayjs";
+import { toast } from 'react-toastify';
 
 const UserDetailPage = () => {
     const { id } = useParams();
@@ -14,31 +14,47 @@ const UserDetailPage = () => {
     const [previouslyBorrowedBooks, setPreviouslyBorrowedBooks] = useState([]);
 
     const [loading, setLoading] = useState(false);
+    const [returnLoading, setReturnLoading] = useState<any>(false);
+
+    const [score, setScore] = useState("");
+    const [isModalOpen, setIsModalOpen] = useState<any>(false);
 
     useEffect(() => {
         if (id) {
-            setLoading(true);
-            axiosInstance.get(`/users/${id}`)
-                .then((response) => {
-                    if (response?.data) {
-                        setUser(response?.data?.user);
-                        setCurrentlyBorrowedBooks(response?.data?.borrowed_books?.filter((book: any) => !book?.return_date));
-                        setPreviouslyBorrowedBooks(response?.data?.borrowed_books?.filter((book: any) => !!book?.return_date));
-                    }
-
-
-                })
-                .catch((error) => {
-                    if (error?.response?.data?.message === 'User not found') {
-                        console.log('User not found');
-                        navigate('/');
-                    }
-                })
-                .finally(() => { setLoading(false); });
+            getData(id);
         }
 
     }, [id]);
 
+    const getData = (id: any, returnBook?: boolean) => {
+        setLoading(true);
+        axiosInstance.get(`/users/${id}`)
+            .then((response) => {
+                if (response?.data) {
+                    setUser(response?.data?.user);
+                    setCurrentlyBorrowedBooks(response?.data?.borrowed_books?.filter((book: any) => !book?.return_date));
+                    setPreviouslyBorrowedBooks(response?.data?.borrowed_books?.filter((book: any) => !!book?.return_date));
+                    setReturnLoading(false);
+                    setScore("");
+                    setIsModalOpen(false);
+                    if (returnBook) {
+                        toast.success('Book returned successfully !');
+                    }
+                }
+
+
+            })
+            .catch((error) => {
+                if (error?.response?.data?.message === 'User not found') {
+                    toast.error('User not found');
+                    console.log('User not found');
+                    navigate('/');
+                } else {
+                    toast.error('Something went wrong');
+                }
+            })
+            .finally(() => { setLoading(false); });
+    }
 
     const currentBorrowedColumns: TableColumnsType = [
         {
@@ -69,11 +85,22 @@ const UserDetailPage = () => {
         },
         {
             title: 'Actions',
-            dataIndex: 'id',
-            key: 'action',
+            dataIndex: 'book_id',
+            key: 'book_id',
             align: 'right',
-            render: (id: string) => (
-                <a href={`/users/${id}`}>View</a>
+            render: (book_id: string) => (
+
+                <Button
+                    disabled={returnLoading == book_id}
+                    loading={returnLoading == book_id}
+                    danger
+                    onClick={() => {
+                        setIsModalOpen(book_id)
+                    }}
+                >
+                    Return Book
+                </Button>
+
             )
         }
     ];
@@ -127,6 +154,35 @@ const UserDetailPage = () => {
         }
     ];
 
+    const returnBook = (book_id: string) => {
+        setReturnLoading(id);
+        axiosInstance.post(`users/${user?.user_id}/return/${book_id}`, {
+            rating: score
+        })
+            .then(() => {
+                getData(id, true);
+            })
+            .catch((error) => {
+                console.log(error);
+                setReturnLoading(false);
+                setIsModalOpen(false);
+                setScore("");
+                toast.error(error?.response?.data?.message || 'Error returning book');
+            })
+
+    }
+
+
+    const handleOk = () => {
+        returnBook(isModalOpen);
+    };
+    const handleCancel = () => {
+        if (!returnLoading || !loading) {
+            setIsModalOpen(false);
+            setScore("");
+        }
+    };
+
     return (
         <>
             <div style={{ margin: 16, display: "flex", alignItems: "center", justifyContent: "center" }} >
@@ -139,14 +195,43 @@ const UserDetailPage = () => {
             </div>
             <div style={{ margin: 16, display: "flex", alignItems: "center", justifyContent: "center" }} >
                 <Card title="Current Borrowed Books" style={{ maxWidth: 1280, width: "100%" }} >
-                    <Table loading={loading} scroll={{ x: 1200 }} dataSource={currentlyBorrowedBooks || []} columns={currentBorrowedColumns} />
+                    <Table rowKey={"book_id"} loading={loading} scroll={{ x: 1200 }} dataSource={currentlyBorrowedBooks || []} columns={currentBorrowedColumns} />
                 </Card>
             </div>
             <div style={{ margin: 16, display: "flex", alignItems: "center", justifyContent: "center" }} >
                 <Card title="Previously Borrowed Books" style={{ maxWidth: 1280, width: "100%" }} >
-                    <Table loading={loading} scroll={{ x: 1200 }} dataSource={previouslyBorrowedBooks || []} columns={previouslyBorrowedColumns} />
+                    <Table rowKey={"book_id"} loading={loading || returnLoading} scroll={{ x: 1200 }} dataSource={previouslyBorrowedBooks || []} columns={previouslyBorrowedColumns} />
                 </Card>
             </div>
+
+            <Modal
+                title="Return book"
+                open={!!isModalOpen}
+                onOk={handleOk}
+                onCancel={handleCancel}
+                okButtonProps={{ disabled: !score || loading || returnLoading, loading: returnLoading }}
+                cancelButtonProps={{ disabled: loading || returnLoading }}
+            >
+                <p>Enter Score</p>
+                <Input
+                    type="number"
+                    placeholder="Enter score between 1-10"
+                    value={score}
+                    onChange={(e) => {
+
+                        const number = parseInt(e.target.value)
+                        if (number > 10 || number < 1) {
+                            return
+                        } else {
+                            setScore(number + "")
+                        }
+
+                    }}
+                    min={1}
+                    max={10}
+                />
+            </Modal>
+
         </>
     )
 }
