@@ -32,4 +32,7 @@ Bu proje, kullanıcıların kitapları ödünç almasına, iade etmesine ve kita
     Frontend: cd web && npm run dev
 
 
+DDL DOSYASI : /source/db/scripts/create_tables.sql
+
+
 
