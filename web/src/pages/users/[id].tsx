@@ -1,49 +1,71 @@
-import { UserOutlined } from "@ant-design/icons";
+
 import { Card, Table, TableColumnsType, Tooltip } from "antd"
-import { Link } from "react-router";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router";
+import { axiosInstance } from "../../plugins/axios";
+import dayjs from "dayjs";
 
 const UserDetailPage = () => {
+    const { id } = useParams();
+    const navigate = useNavigate();
 
-    const currentlyBorrowedDataSource = [
-        {
-            id: '6',
-            name: 'Moby-Dick',
+    const [user, setUser] = useState<any>(null);
+    const [currentlyBorrowedBooks, setCurrentlyBorrowedBooks] = useState([]);
+    const [previouslyBorrowedBooks, setPreviouslyBorrowedBooks] = useState([]);
+
+    const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        if (id) {
+            setLoading(true);
+            axiosInstance.get(`/users/${id}`)
+                .then((response) => {
+                    if (response?.data) {
+                        setUser(response?.data?.user);
+                        setCurrentlyBorrowedBooks(response?.data?.borrowed_books?.filter((book: any) => !book?.return_date));
+                        setPreviouslyBorrowedBooks(response?.data?.borrowed_books?.filter((book: any) => !!book?.return_date));
+                    }
+
+
+                })
+                .catch((error) => {
+                    if (error?.response?.data?.message === 'User not found') {
+                        console.log('User not found');
+                        navigate('/');
+                    }
+                })
+                .finally(() => { setLoading(false); });
         }
-    ];
 
-    const previouslyBorrowedDataSource = [
-        { id: '1', name: 'The Great Gatsby', userScore: 1 },
-        { id: '2', name: 'To Kill a Mockingbird', userScore: 4 },
-        { id: '3', name: '1984', userScore: 8 },
-        { id: '4', name: 'Pride and Prejudice', userScore: 2 },
-        { id: '5', name: 'The Catcher in the Rye', userScore: 7 },
-        { id: '7', name: 'War and Peace', userScore: 10 },
-        { id: '8', name: 'The Odyssey', userScore: 9 },
-        { id: '9', name: 'Crime and Punishment', userScore: 10 },
-        { id: '10', name: 'Brave New World', userScore: 9 },
-        { id: '11', name: 'The Lord of the Rings', userScore: 7 },
-        { id: '12', name: 'Ulysses', userScore: 8 },
-        { id: '13', name: 'The Brothers Karamazov', userScore: 3 },
-        { id: '14', name: 'The Picture of Dorian Gray', userScore: 7 },
-        { id: '15', name: 'Wuthering Heights', userScore: 5 },
-        { id: '16', name: 'The Hobbit', userScore: 2 },
-        { id: '17', name: 'Frankenstein', userScore: 10 },
-        { id: '18', name: 'Dracula', userScore: 9 },
-        { id: '19', name: 'Fahrenheit 451', userScore: 2 },
-        { id: '20', name: 'The Divine Comedy', userScore: 9 }
-    ];
+    }, [id]);
 
 
     const currentBorrowedColumns: TableColumnsType = [
         {
             title: 'ID',
-            dataIndex: 'id',
-            key: 'id',
+            dataIndex: 'book_id',
+            key: 'book_id',
         },
         {
             title: 'Name',
-            dataIndex: 'name',
-            key: 'name',
+            dataIndex: 'book_title',
+            key: 'book_title',
+        },
+        {
+            title: 'Author',
+            dataIndex: 'book_author',
+            key: 'book_author',
+        },
+        {
+            title: 'Bool Published Year',
+            dataIndex: 'book_published_year',
+            key: 'book_published_year',
+        },
+        {
+            title: 'Borrow Date',
+            dataIndex: 'borrow_date',
+            key: 'borrow_date',
+            render: (date: string) => new Date(date).toLocaleDateString()
         },
         {
             title: 'Actions',
@@ -59,18 +81,40 @@ const UserDetailPage = () => {
     const previouslyBorrowedColumns: TableColumnsType = [
         {
             title: 'ID',
-            dataIndex: 'id',
-            key: 'id',
+            dataIndex: 'book_id',
+            key: 'book_id',
         },
         {
             title: 'Name',
-            dataIndex: 'name',
-            key: 'name',
+            dataIndex: 'book_title',
+            key: 'book_title',
+        },
+        {
+            title: 'Author',
+            dataIndex: 'book_author',
+            key: 'book_author',
+        },
+        {
+            title: 'Bool Published Year',
+            dataIndex: 'book_published_year',
+            key: 'book_published_year',
+        },
+        {
+            title: 'Borrow Date',
+            dataIndex: 'borrow_date',
+            key: 'borrow_date',
+            render: (date: string) => new Date(date).toLocaleDateString()
+        },
+        {
+            title: 'Return Date',
+            dataIndex: 'return_date',
+            key: 'return_date',
+            render: (date: string) => new Date(date).toLocaleDateString()
         },
         {
             title: 'User Score',
-            dataIndex: 'userScore',
-            key: 'userScore',
+            dataIndex: 'book_rating',
+            key: 'book_rating',
         },
         {
             title: 'Actions',
@@ -87,18 +131,20 @@ const UserDetailPage = () => {
         <>
             <div style={{ margin: 16, display: "flex", alignItems: "center", justifyContent: "center" }} >
                 <Card title="User" style={{ maxWidth: 1280, width: "100%" }} >
-                    <p><b>ID:</b> 12312</p>
-                    <p><b>Name:</b> Batuhan Yılmaz</p>
+                    <p><b>ID:</b> {user?.user_id}</p>
+                    <p><b>Name:</b> {user?.first_name} {user?.last_name}</p>
+                    <p><b>E-mail:</b> {user?.email}</p>
+                    <p><b>Registration Date:</b> {new Date(user?.registration_date).toLocaleDateString()}</p>
                 </Card>
             </div>
             <div style={{ margin: 16, display: "flex", alignItems: "center", justifyContent: "center" }} >
                 <Card title="Current Borrowed Books" style={{ maxWidth: 1280, width: "100%" }} >
-                    <Table scroll={{ x: 1200 }} dataSource={currentlyBorrowedDataSource} columns={currentBorrowedColumns} />
+                    <Table loading={loading} scroll={{ x: 1200 }} dataSource={currentlyBorrowedBooks || []} columns={currentBorrowedColumns} />
                 </Card>
             </div>
             <div style={{ margin: 16, display: "flex", alignItems: "center", justifyContent: "center" }} >
                 <Card title="Previously Borrowed Books" style={{ maxWidth: 1280, width: "100%" }} >
-                    <Table scroll={{ x: 1200 }} dataSource={previouslyBorrowedDataSource} columns={previouslyBorrowedColumns} />
+                    <Table loading={loading} scroll={{ x: 1200 }} dataSource={previouslyBorrowedBooks || []} columns={previouslyBorrowedColumns} />
                 </Card>
             </div>
         </>
