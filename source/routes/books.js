@@ -17,7 +17,7 @@ router.get('/:id', async (req, res) => {
 
   try {
 
-    const bookDetails = await knex('   as b')
+    const bookDetails = await knex('books as b')
       .select(
         'b.title',
         'b.author',
