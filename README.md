@@ -26,7 +26,7 @@ Bu proje, kullanıcıların kitapları ödünç almasına, iade etmesine ve kita
 
     web ve source için .env.example dosyalarını .env olarak kopyalayın ve kendi bilgilerinizi doldurun. Bu dosyayı asla public repolarda saklamayın.
 
-4. **.Uygulamayı Çalıştırma**
+4. **Uygulamayı Çalıştırma**
 
     Backend: cd source && npm start
     Frontend: cd web && npm run dev
