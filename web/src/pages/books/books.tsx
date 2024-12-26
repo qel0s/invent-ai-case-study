@@ -21,9 +21,6 @@ const BooksPage = () => {
 
   }, []);
 
-
-
-
   const columns: TableColumnsType = [
     {
       title: 'ID',
@@ -57,11 +54,11 @@ const BooksPage = () => {
     },
     {
       title: 'Actions',
-      dataIndex: 'id',
-      key: 'action',
+      dataIndex: 'book_id',
+      key: 'book_id',
       align: 'right',
-      render: (id: string) => (
-        <Link to={`/books/${id}`} >
+      render: (book_id: string) => (
+        <Link to={`/books/${book_id}`} >
           <Button type="text" icon={<EditOutlined />}>Details</Button>
         </Link>
       )

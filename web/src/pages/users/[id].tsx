@@ -1,9 +1,10 @@
 
-import { Button, Card, Input, Modal, Table, TableColumnsType } from "antd"
+import { Button, Card, Input, Modal, Space, Table, TableColumnsType } from "antd"
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router";
+import { Link, useNavigate, useParams } from "react-router";
 import { axiosInstance } from "../../plugins/axios";
 import { toast } from 'react-toastify';
+import { EditOutlined } from "@ant-design/icons";
 
 const UserDetailPage = () => {
     const { id } = useParams();
@@ -46,11 +47,11 @@ const UserDetailPage = () => {
             })
             .catch((error) => {
                 if (error?.response?.data?.message === 'User not found') {
-                    toast.error('User not found');
+                    toast.error(error?.response?.data?.message || 'User not found');
                     console.log('User not found');
                     navigate('/');
                 } else {
-                    toast.error('Something went wrong');
+                    toast.error(error?.response?.data?.message || 'Something went wrong when getting user details');
                 }
             })
             .finally(() => { setLoading(false); });
@@ -90,16 +91,22 @@ const UserDetailPage = () => {
             align: 'right',
             render: (book_id: string) => (
 
-                <Button
-                    disabled={returnLoading == book_id}
-                    loading={returnLoading == book_id}
-                    danger
-                    onClick={() => {
-                        setIsModalOpen(book_id)
-                    }}
-                >
-                    Return Book
-                </Button>
+                <Space>
+                    <Link to={`/books/${book_id}`} >
+                        <Button type="text" icon={<EditOutlined />}>Details</Button>
+                    </Link>
+                    <Button
+                        disabled={returnLoading == book_id}
+                        loading={returnLoading == book_id}
+                        danger
+                        onClick={() => {
+                            setIsModalOpen(book_id)
+                        }}
+                    >
+                        Return Book
+                    </Button>
+
+                </Space>
 
             )
         }
@@ -145,11 +152,13 @@ const UserDetailPage = () => {
         },
         {
             title: 'Actions',
-            dataIndex: 'id',
-            key: 'action',
+            dataIndex: 'book_id',
+            key: 'book_id',
             align: 'right',
-            render: (id: string) => (
-                <a href={`/users/${id}`}>View</a>
+            render: (book_id: string) => (
+                <Link to={`/books/${book_id}`} >
+                    <Button type="text" icon={<EditOutlined />}>Details</Button>
+                </Link>
             )
         }
     ];

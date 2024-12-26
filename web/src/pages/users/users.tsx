@@ -16,96 +16,12 @@ const UsersPage = () => {
             .then((response) => { setUsers(response?.data || []); })
             .catch((error) => {
                 console.log(error)
-                toast.error(error?.response?.data?.message || 'Error returning book');
+                toast.error(error?.response?.data?.message || 'Error when getting users');
             })
             .finally(() => { setLoading(false); });
 
     }, []);
 
-
-
-    const dataSource = [
-        {
-            id: '1',
-            name: 'Mike',
-        },
-        {
-            id: '2',
-            name: 'Mike',
-        },
-        {
-            id: '3',
-            name: 'Mike',
-        },
-        {
-            id: '4',
-            name: 'Mike',
-        },
-        {
-            id: '5',
-            name: 'Mike',
-        },
-        {
-            id: '6',
-            name: 'Sarah',
-        },
-        {
-            id: '7',
-            name: 'John',
-        },
-        {
-            id: '8',
-            name: 'Emma',
-        },
-        {
-            id: '9',
-            name: 'Chris',
-        },
-        {
-            id: '10',
-            name: 'Alice',
-        },
-        {
-            id: '11',
-            name: 'Bob',
-        },
-        {
-            id: '12',
-            name: 'Sophia',
-        },
-        {
-            id: '13',
-            name: 'James',
-        },
-        {
-            id: '14',
-            name: 'Liam',
-        },
-        {
-            id: '15',
-            name: 'Olivia',
-        },
-        {
-            id: '16',
-            name: 'Ethan',
-        },
-        {
-            id: '17',
-            name: 'Mia',
-        },
-        {
-            id: '18',
-            name: 'Daniel',
-        },
-        {
-            id: '19',
-            name: 'Charlotte',
-        },
-        {
-            id: '20',
-            name: 'Lucas',
-        },
-    ];
 
     const columns: TableColumnsType = [
         {
