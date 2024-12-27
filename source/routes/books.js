@@ -4,7 +4,7 @@ var router = express.Router();
 
 router.get('/', async function (req, res, next) {
   try {
-    const books = await knex('books').select('*');
+    const books = await knex('books').select('book_id', 'title', 'author', 'published_year', 'genre', 'rating', 'rating_count');
     res.json(books);
   } catch (error) {
     console.log(error);

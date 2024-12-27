@@ -5,7 +5,7 @@ var knex = require('../db/knex');
 
 router.get('/', async function (req, res, next) {
   try {
-    const users = await knex('users').select('*');
+    const users = await knex('users').select('user_id', 'first_name', 'last_name', 'email', 'registration_date');
     res.json(users);
   } catch (error) {
     console.log(error);
